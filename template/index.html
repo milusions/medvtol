@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=landscape">
+    <title>AirLink</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Nipple.js for Joystick Physics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
+    
+    <style>
+        :root {
+            /* Dark Mode Theme */
+            --bg-color: #0a0c10;
+            --chassis-top: #2b2f36;
+            --chassis-bottom: #1a1d21;
+            --primary-color: #0088ff; 
+            --screen-bg: #0f172a;
+            --screen-text: #38bdf8;
+            --text-dark: #f1f5f9;
+            
+            /* Button Variables */
+            --btn-top: #333840;
+            --btn-bottom: #24282d;
+            --btn-border: #15171a;
+            --btn-text: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            user-select: none;
+            touch-action: none;
+        }
+
+        /* Header Styles */
+        header {
+            position: relative;
+            text-align: center;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 920px;
+        }
+
+        header i.fa-plane-up {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            filter: drop-shadow(0 2px 4px rgba(0, 136, 255, 0.4));
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-dark);
+        }
+
+        /* Fullscreen Button */
+        .fs-btn {
+            position: absolute;
+            right: 15px;
+            background: linear-gradient(to bottom, var(--btn-top), var(--btn-bottom));
+            border: 1px solid var(--btn-border);
+            color: var(--btn-text);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.05);
+            transition: all 0.1s ease;
+        }
+
+        .fs-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+        }
+
+        /* Controller Chassis */
+        .controller-chassis {
+            background: linear-gradient(145deg, var(--chassis-top), var(--chassis-bottom));
+            border: 1px solid #3c424b;
+            border-radius: 40px;
+            padding: 35px 40px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 95%;
+            max-width: 920px; 
+            gap: 30px;
+            box-shadow: 
+                0 15px 45px rgba(0, 0, 0, 0.6),
+                inset 0 4px 10px rgba(255, 255, 255, 0.05),
+                inset 0 -5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .side-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 250px;
+        }
+
+        /* Joystick Base Styling */
+        .joystick-zone {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            background: #1f2227; 
+            border-radius: 50%;
+            border: 2px solid #111316;
+            box-shadow: 
+                inset 0 10px 25px rgba(0,0,0,0.6),
+                inset 0 -2px 5px rgba(255,255,255,0.05),
+                0 2px 4px rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+
+        /* Custom Nipple.js Joystick Appearance Overrides */
+        .nipple .back {
+            background: radial-gradient(circle at 50% 50%, #2a3038 0%, #171a1e 100%) !important;
+            border: 1px solid #0a0b0d !important;
+            box-shadow: inset 0 15px 25px rgba(0,0,0,0.8) !important;
+            opacity: 1 !important; 
+        }
+
+        .nipple .front {
+            background: 
+                radial-gradient(circle at 50% 30%, #525a61 0%, #30363a 40%, #15181b 80%, #08090a 100%),
+                repeating-radial-gradient(circle, transparent, transparent 2px, rgba(255,255,255,0.02) 3px) !important;
+            box-shadow: 
+                0 15px 20px rgba(0,0,0,0.8), 
+                inset 0 2px 5px rgba(255,255,255,0.1),
+                inset 0 -3px 6px rgba(0,0,0,0.9) !important;
+            border: 1px solid #000 !important;
+            opacity: 1 !important; 
+        }
+
+        /* Aux Buttons & Flight Mode Selector */
+        .aux-group {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+            align-items: stretch;
+        }
+
+        .aux-btn {
+            background: linear-gradient(to bottom, var(--btn-top), var(--btn-bottom));
+            border: 1px solid var(--btn-border);
+            color: var(--btn-text);
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 
+                0 4px 6px rgba(0,0,0,0.3),
+                inset 0 2px 4px rgba(255,255,255,0.05);
+            outline: none;
+            width: 85px;
+            text-align: center;
+        }
+
+        .aux-btn.push:active, .aux-btn.active {
+            background: linear-gradient(to bottom, #1a1d21, #111316);
+            color: var(--primary-color);
+            border-color: #000;
+            box-shadow: 
+                0 1px 2px rgba(0,0,0,0.5),
+                inset 0 2px 5px rgba(0,0,0,0.6);
+            text-shadow: 0 0 5px rgba(0, 136, 255, 0.4);
+            transform: translateY(2px);
+        }
+
+        /* Direct Segmented Flight Mode Selector */
+        .fm-selector {
+            display: flex;
+            background: linear-gradient(to bottom, var(--btn-top), var(--btn-bottom));
+            border: 1px solid var(--btn-border);
+            border-radius: 8px;
+            box-shadow: 
+                0 4px 6px rgba(0,0,0,0.3),
+                inset 0 2px 4px rgba(255,255,255,0.05);
+            overflow: hidden;
+            width: 130px;
+        }
+
+        .fm-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            border-right: 1px solid var(--btn-border);
+            color: var(--btn-text);
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            outline: none;
+        }
+        
+        .fm-btn:last-child { border-right: none; }
+
+        .fm-btn.active {
+            background: var(--primary-color);
+            color: #ffffff;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+            text-shadow: none;
+        }
+
+        /* Center Console */
+        .center-console {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            gap: 35px;
+        }
+
+        /* LCD Screen */
+        .lcd-screen {
+            background-color: var(--screen-bg);
+            width: 170px;
+            height: 90px;
+            border-radius: 6px;
+            border: 3px solid #0a0d14;
+            box-shadow: 
+                inset 0 3px 8px rgba(0,0,0,0.8),
+                0 2px 4px rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--screen-text);
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 900;
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .lcd-screen::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.25) 50%, transparent 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        .lcd-screen .title {
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+            letter-spacing: 1px;
+        }
+
+        .lcd-screen .mode-display {
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            opacity: 0.8;
+            font-weight: bold;
+        }
+
+        .lcd-screen .status {
+            font-size: 0.85rem;
+        }
+
+        /* Power Button */
+        .power-btn-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #1a1d21;
+            padding: 8px;
+            border-radius: 50px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 2px 4px rgba(255,255,255,0.05);
+        }
+
+        .power-btn {
+            background: linear-gradient(to bottom, var(--btn-top), var(--btn-bottom));
+            border: 1px solid var(--btn-border);
+            color: var(--btn-text);
+            width: 70px;
+            height: 45px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.4rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.05);
+            outline: none;
+        }
+
+        .power-btn.active {
+            background: linear-gradient(to bottom, #1a1d21, #111316);
+            color: var(--primary-color);
+            border-color: #000;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.5), inset 0 2px 5px rgba(0,0,0,0.6);
+            transform: translateY(2px);
+        }
+
+        .power-btn.active i {
+            filter: drop-shadow(0 0 6px var(--primary-color));
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 850px) {
+            .controller-chassis { padding: 20px; gap: 15px; }
+            .joystick-zone { width: 160px; height: 160px; }
+            .side-section { width: auto; }
+            .lcd-screen { width: 140px; height: 75px; }
+            .aux-btn { width: 75px; font-size: 0.75rem; padding: 8px 10px; }
+            .fm-selector { width: 110px; }
+            .fm-btn { font-size: 0.65rem; }
+        }
+
+        @media (max-width: 600px) {
+            .controller-chassis { flex-direction: column; padding: 25px; max-width: 380px; }
+            .center-console { flex-direction: row; width: 100%; justify-content: space-around; margin: 10px 0; }
+            .joystick-zone { width: 180px; height: 180px; }
+            .lcd-screen { width: 120px; height: 65px; }
+            .side-section { width: 100%; }
+            header { max-width: 380px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <i class="fa-solid fa-plane-up"></i>
+        <h1> AirLink</h1>
+        <button id="fullscreen-btn" class="fs-btn" aria-label="Toggle Fullscreen">
+            <i class="fa-solid fa-expand"></i>
+        </button>
+    </header>
+
+    <main class="controller-chassis">
+        
+        <!-- Left Section (Throttle/Yaw) -->
+        <div class="side-section">
+            <div id="left-joystick" class="joystick-zone"></div>
+            <div class="aux-group">
+                <button class="aux-btn toggle" id="btn-arm">ARM</button>
+                <div class="fm-selector">
+                    <button class="fm-btn active" data-mode="FM-1">1</button>
+                    <button class="fm-btn" data-mode="FM-2">2</button>
+                    <button class="fm-btn" data-mode="FM-3">3</button>
+                    <button class="fm-btn" data-mode="FM-4">4</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Console -->
+        <div class="center-console">
+            <div class="lcd-screen" id="lcd-display">
+                <div class="title">AIRLINK</div>
+                <div class="mode-display" id="lcd-mode">MODE: FM-1</div>
+                <div class="status" id="sys-status">OFFLINE</div>
+            </div>
+            
+            <div class="power-btn-container">
+                <button class="power-btn" id="power-btn" aria-label="Power Button">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Section (Pitch/Roll) -->
+        <div class="side-section">
+            <div id="right-joystick" class="joystick-zone"></div>
+            <div class="aux-group">
+                <button class="aux-btn toggle" id="btn-aux1">AUX 1</button>
+                <button class="aux-btn push" id="btn-aux2">AUX 2</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const hostIP = window.location.hostname; 
+
+        // ==========================================
+        //  CONFIG: WEBSOCKET METADATA & DATA FORMAT
+        // ==========================================
+        const WS_CONFIG = {
+            url: `ws://${hostIP}:8888`, 
+            updateRateMs: 50, // 20Hz update rate
+            formatPayload: function(channels) {
+                return JSON.stringify({
+                    type: "rc_command",
+                    timestamp: Date.now(),
+                    channels: {
+                        channel_1: channels.throttle,
+                        channel_2: channels.yaw,
+                        channel_3: channels.pitch,
+                        channel_4: channels.roll,
+                        channel_5: channels.arm,
+                        channel_6: channels.mode,
+                        channel_7: channels.aux1,
+                        channel_8: channels.aux2
+                    }
+                });
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // --- System State ---
+            let sys = {
+                isPoweredOn: false,
+                isBooting: false,
+                isArmed: false,
+                currentMode: 'FM-1',
+                ws: null,
+                telemetryInterval: null
+            };
+
+            // RC Channel mapping object (1000 - 2000 standard)
+            let rcChannels = {
+                throttle: 1000,
+                yaw: 1500,
+                pitch: 1500,
+                roll: 1500,
+                arm: 1000,
+                mode: 1000,
+                aux1: 1000,
+                aux2: 1000
+            };
+
+            // --- Audio / Voice Setup ---
+            const synth = window.speechSynthesis;
+            let lastAnnouncedWarning = "";
+
+            function speak(text) {
+                if (!synth) return;
+                if (synth.speaking) synth.cancel(); 
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1.0; 
+                utterance.pitch = 1.1; 
+                synth.speak(utterance);
+            }
+
+            // --- Elements ---
+            const powerBtn = document.getElementById('power-btn');
+            const sysStatus = document.getElementById('sys-status');
+            const lcdScreen = document.getElementById('lcd-display');
+            const lcdMode = document.getElementById('lcd-mode');
+            
+            const btnArm = document.getElementById('btn-arm');
+            const fmButtons = document.querySelectorAll('.fm-btn');
+            const btnAux1 = document.getElementById('btn-aux1');
+            const btnAux2 = document.getElementById('btn-aux2');
+
+            // --- Fullscreen Logic ---
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            const fsIcon = fullscreenBtn.querySelector('i');
+
+            fullscreenBtn.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().then(() => {
+                        fsIcon.classList.remove('fa-expand');
+                        fsIcon.classList.add('fa-compress');
+                    }).catch(err => {
+                        console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+                    });
+                } else {
+                    document.exitFullscreen().then(() => {
+                        fsIcon.classList.remove('fa-compress');
+                        fsIcon.classList.add('fa-expand');
+                    });
+                }
+            });
+
+            // --- Joystick Initialization ---
+            const stickSize = 130;
+            const maxRadius = stickSize / 2; // 65px (Used for math mapping to 1000-2000)
+
+            const leftManager = nipplejs.create({
+                zone: document.getElementById('left-joystick'),
+                mode: 'static',
+                position: { left: '50%', top: '50%' },
+                size: stickSize,
+                restJoystick: false 
+            });
+
+            const rightManager = nipplejs.create({
+                zone: document.getElementById('right-joystick'),
+                mode: 'static',
+                position: { left: '50%', top: '50%' },
+                size: stickSize,
+                restJoystick: true
+            });
+            
+            const leftNipple = leftManager[0];
+            const rightNipple = rightManager[0];
+
+            // --- Math Function for mapping coordinates to RC 1000-2000 range ---
+            function mapCoordToRC(val, inverted = false) {
+                let scaled = (val / maxRadius) * 500; 
+                let rcVal = inverted ? 1500 - scaled : 1500 + scaled;
+                return Math.max(1000, Math.min(2000, Math.round(rcVal)));
+            }
+
+            // --- Bootup & Safety Logic ---
+            let bootCheckInterval;
+
+            function checkBootState() {
+                if (!sys.isBooting) return;
+                
+                const currentThrottle = mapCoordToRC(leftNipple.frontPosition.y, true);
+                const throttleSafe = currentThrottle < 1050; 
+                
+                const switchesSafe = !btnArm.classList.contains('active') && 
+                                     !btnAux1.classList.contains('active') && 
+                                     !btnAux2.classList.contains('active') && 
+                                     sys.currentMode === 'FM-1';
+
+                if (throttleSafe && switchesSafe) {
+                    sys.isBooting = false;
+                    clearInterval(bootCheckInterval);
+                    lastAnnouncedWarning = "";
+                    connectWebSocket();
+                } else {
+                    // Dark Mode Error Colors
+                    lcdScreen.style.backgroundColor = "#450a0a"; 
+                    lcdScreen.style.color = "#f87171";
+                    
+                    let currentWarning = "";
+                    let visualText = "";
+
+                    if (!throttleSafe && !switchesSafe) {
+                        currentWarning = "Throttle and Switch warning.";
+                        visualText = "WARN: THR & SW";
+                    } else if (!throttleSafe) {
+                        currentWarning = "Throttle warning.";
+                        visualText = "WARN: THR TO 0";
+                    } else {
+                        currentWarning = "Switch warning.";
+                        visualText = "WARN: RESET SW";
+                    }
+
+                    sysStatus.innerText = visualText;
+
+                    if (currentWarning !== lastAnnouncedWarning) {
+                        speak(currentWarning);
+                        lastAnnouncedWarning = currentWarning;
+                    }
+                }
+            }
+
+            // --- WebSocket & Telemetry Loop ---
+            function startTelemetryLoop() {
+                if (sys.telemetryInterval) clearInterval(sys.telemetryInterval);
+                
+                sys.telemetryInterval = setInterval(() => {
+                    rcChannels.yaw = mapCoordToRC(leftNipple.frontPosition.x, false);
+                    rcChannels.throttle = mapCoordToRC(leftNipple.frontPosition.y, true);
+                    rcChannels.roll = mapCoordToRC(rightNipple.frontPosition.x, false);
+                    rcChannels.pitch = mapCoordToRC(rightNipple.frontPosition.y, true);
+
+                    rcChannels.arm = btnArm.classList.contains('active') ? 2000 : 1000;
+                    rcChannels.aux1 = btnAux1.classList.contains('active') ? 2000 : 1000;
+                    rcChannels.aux2 = btnAux2.classList.contains('active') ? 2000 : 1000;
+
+                    const modeMap = { 'FM-1': 1000, 'FM-2': 1333, 'FM-3': 1666, 'FM-4': 2000 };
+                    rcChannels.mode = modeMap[sys.currentMode];
+
+                    const payload = WS_CONFIG.formatPayload(rcChannels);
+                    
+                    if (sys.ws && sys.ws.readyState === WebSocket.OPEN) {
+                        sys.ws.send(payload);
+                    }
+                    
+                }, WS_CONFIG.updateRateMs);
+            }
+
+            function connectWebSocket() {
+                sysStatus.innerText = "CONNECTING...";
+                lcdScreen.style.backgroundColor = "#422006"; // Dark Mode Connecting
+                lcdScreen.style.color = "#fde047";
+                
+                try {
+                    sys.ws = new WebSocket(WS_CONFIG.url);
+                    
+                    sys.ws.onopen = () => {
+                        lcdScreen.style.backgroundColor = "#064e3b"; // Dark Mode Connected
+                        lcdScreen.style.color = "var(--screen-text)";
+                        sysStatus.innerText = "CONNECTED";
+                        sysStatus.style.color = "#34d399";
+                        startTelemetryLoop(); 
+                    };
+
+                    sys.ws.onerror = (e) => {
+                        sysStatus.innerText = "WS ERROR";
+                        lcdScreen.style.backgroundColor = "#7c2d12"; // Dark Mode Error/Warning
+                        sysStatus.style.color = "#fb923c";
+                        
+                        setTimeout(() => {
+                            if(!sys.isPoweredOn) return;
+                            lcdScreen.style.backgroundColor = "#064e3b"; 
+                            lcdScreen.style.color = "var(--screen-text)";
+                            sysStatus.innerText = "CONNECTED (SIM)";
+                            sysStatus.style.color = "#34d399";
+                            startTelemetryLoop(); 
+                        }, 1000);
+                    };
+
+                    sys.ws.onclose = () => {
+                        if (sys.isPoweredOn) {
+                            sysStatus.innerText = "DISCONNECTED";
+                            lcdScreen.style.backgroundColor = "#7c2d12";
+                            sysStatus.style.color = "#fb923c";
+                            if(sys.telemetryInterval) clearInterval(sys.telemetryInterval);
+                        }
+                    };
+
+                } catch (e) {
+                    console.warn("WebSocket initiation failed. Ensure url is valid.");
+                }
+            }
+
+            function disconnectWebSocket() {
+                if(sys.telemetryInterval) clearInterval(sys.telemetryInterval);
+                if(sys.ws) {
+                    sys.ws.close();
+                    sys.ws = null;
+                }
+            }
+
+            // --- Power Button ---
+            powerBtn.addEventListener('click', () => {
+                sys.isPoweredOn = !sys.isPoweredOn;
+                
+                if (sys.isPoweredOn) {
+                    speak("Airlink On.");
+                    powerBtn.classList.add('active');
+                    sys.isBooting = true;
+                    lastAnnouncedWarning = "";
+                    
+                    sysStatus.innerText = "BOOTING...";
+                    lcdScreen.style.backgroundColor = "#1e293b"; // Dark mode Booting
+                    lcdScreen.style.color = "#94a3b8";
+                    sysStatus.style.color = "#94a3b8";
+                    
+                    bootCheckInterval = setInterval(checkBootState, 150);
+                } else {
+                    speak("Airlink Off.");
+                    powerBtn.classList.remove('active');
+                    sys.isBooting = false;
+                    clearInterval(bootCheckInterval);
+                    disconnectWebSocket();
+                    
+                    sysStatus.innerText = "OFFLINE";
+                    sysStatus.style.color = "var(--screen-text)";
+                    lcdScreen.style.backgroundColor = "var(--screen-bg)";
+                    lcdScreen.style.color = "var(--screen-text)";
+                    
+                    if (sys.isArmed) {
+                        sys.isArmed = false;
+                        btnArm.classList.remove('active');
+                    }
+                    btnAux1.classList.remove('active');
+                }
+            });
+
+            // --- Toggle Buttons (ARM & AUX 1) ---
+            [btnArm, btnAux1].forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (!sys.isPoweredOn) return;
+                    btn.classList.toggle('active');
+                    
+                    if (e.target.id === 'btn-arm' && !sys.isBooting) {
+                        sys.isArmed = btn.classList.contains('active');
+                        sysStatus.innerText = sys.isArmed ? "ARMED!" : "CONNECTED";
+                        sysStatus.style.color = sys.isArmed ? "#ef4444" : "#34d399";
+                        
+                        if (sys.isArmed) speak("System Armed");
+                        else speak("System Disarmed");
+                    }
+                });
+            });
+
+            // --- Direct Segmented Flight Mode Selector ---
+            fmButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (!sys.isPoweredOn) return;
+                    
+                    fmButtons.forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    sys.currentMode = e.target.getAttribute('data-mode');
+                    lcdMode.innerText = `MODE: ${sys.currentMode}`;
+                    
+                    if(!sys.isBooting) speak("Flight Mode " + sys.currentMode.replace('FM-', ''));
+                });
+            });
+
+            // --- Push Button (AUX 2 - Momentary) ---
+            const activatePush = () => { if (sys.isPoweredOn) btnAux2.classList.add('active'); };
+            const deactivatePush = () => { btnAux2.classList.remove('active'); };
+
+            btnAux2.addEventListener('mousedown', activatePush);
+            btnAux2.addEventListener('touchstart', (e) => { e.preventDefault(); activatePush(); });
+            btnAux2.addEventListener('mouseup', deactivatePush);
+            btnAux2.addEventListener('mouseleave', deactivatePush);
+            btnAux2.addEventListener('touchend', deactivatePush);
+
+            // --- Left Joystick Logic (Sticky Y, Auto-Return X) ---
+            leftManager.on('end', function(evt, nipple) {
+                const frontKnob = nipple.ui.front;
+                nipple.frontPosition.x = 0; // Reset X internally
+                
+                frontKnob.style.transition = 'transform 0.15s ease-out';
+                frontKnob.style.transform = `translate(0px, ${nipple.frontPosition.y}px)`; // Maintain Y, snap X
+                
+                setTimeout(() => { frontKnob.style.transition = ''; }, 150);
+            });
+
+            // --- Right Joystick Logic (Auto-Return X and Y) ---
+            rightManager.on('end', function(evt, nipple) {
+                // Explicitly zero out the internal positions for the telemetry loop
+                nipple.frontPosition.x = 0;
+                nipple.frontPosition.y = 0;
+            });
+        });
+    </script>
+</body>
+</html>

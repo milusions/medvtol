@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="police_station">
+    <static>true</static>
+    <link name="link">
+      <!-- Main body collision scaled by 0.2 -->
+      <collision name="collision_main">
+        <pose>0 0 0.857995465 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>2.607408552 2.607408552 1.715990929</size>
+          </box>
+        </geometry>
+      </collision>
+      
+      <!-- Landing area collision scaled by 0.2 -->
+      <collision name="collision_landing">
+        <pose>0 0 0.092817264 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>2.607408552 3.248917048 0.185634528</size>
+          </box>
+        </geometry>
+      </collision>
+      
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <mesh>
+            <uri>model://medical_storage/meshes/police_station.dae</uri>
+            <scale>0.2 0.2 0.2</scale>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

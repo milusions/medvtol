@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="hospital">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://hospital/meshes/osrf_first_office.dae</uri>
+            <scale>0.3 0.3 0.3</scale> <!-- Moved inside <mesh> -->
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://hospital/meshes/osrf_first_office.dae</uri>
+            <scale>0.3 0.3 0.3</scale> <!-- Moved inside <mesh> -->
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,6 @@
+build
+install
+log
+.backup
+qgc.AppImage
+.vscode

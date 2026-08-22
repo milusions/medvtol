@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf version="1.9">
+    <model name="helipad">
+        <static>true</static>
+        <pose>0 0 0.001 0 0 0</pose>
+        <link name="base">
+            <visual name="base_visual">
+                <geometry>
+                    <plane>
+                        <normal>0 0 1</normal>
+                        <size>2.5 2.5</size>
+                    </plane>
+                </geometry>
+                <material>
+                    <diffuse>1 1 1 1</diffuse>
+                    <specular>0.4 0.4 0.4 1</specular>
+                    <pbr>
+                        <metal>
+                            <albedo_map>https://fuel.gazebosim.org/1.0/saiaravind19/models/helipad/1/files/helipad.jpg</albedo_map>
+                        </metal>
+                    </pbr>
+                </material>
+            </visual>
+            <!-- Collision block: box instead of plane — plane creates an infinite
+                 half-space in Bullet which interferes with heightmap contact detection -->
+            <collision name="base_collision">
+                <geometry>
+                    <box>
+                        <size>2.5 2.5 0.02</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>1.0</mu>
+                            <mu2>1.0</mu2>
+                        </ode>
+                        <bullet>
+                            <friction>1.0</friction>
+                            <friction2>1.0</friction2>
+                            <rolling_friction>0.01</rolling_friction>
+                        </bullet>
+                    </friction>
+                </surface>
+            </collision>
+        </link>
+    </model>
+</sdf>

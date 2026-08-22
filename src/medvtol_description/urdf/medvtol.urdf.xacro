@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="medvtol">
+
+    <link name="base_footprint" />
+
+    <!-- MAIN CHASSIS (Must be named base_link for PX4) -->
+    <link name="base_link">
+        <inertial>
+            <mass value="2.5" />
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <inertia ixx="0.0309824" ixy="0.0" ixz="0.0" iyy="0.0308285" iyz="0.0" izz="0.0568877" />
+        </inertial>
+
+        <visual>
+            <origin rpy="1.57 0 1.57" xyz="-0.20 0 0" />
+            <geometry>
+                <mesh filename="package://medvtol_description/meshes/medvtol.obj"
+                    scale="0.01 0.01 0.01" />
+            </geometry>
+        </visual>
+
+        <collision>
+            <origin rpy="1.57 0 1.57" xyz="-0.20 0 0" />
+            <geometry>
+                <mesh filename="package://medvtol_description/meshes/medvtol.obj"
+                    scale="0.01 0.01 0.01" />
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="base_joint" type="fixed">
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <parent link="base_footprint" />
+        <child link="base_link" />
+    </joint>
+
+    <!-- ROTORS (Strictly named rotor_0, rotor_1... with collisions removed) -->
+
+    <!-- Rotor 0: Front Right (CCW) -->
+    <link name="rotor_1">
+        <inertial>
+            <mass value="0.05" />
+            <origin xyz="0 0 0" rpy="0 0 1.57" />
+            <inertia ixx="5.20833e-07" ixy="0.0" ixz="0.0" iyy="2.68854e-04" iyz="0.0"
+                izz="2.69271e-04" />
+        </inertial>
+        <visual>
+            <origin rpy="1.57 0 0" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://medvtol_description/meshes/medvtol_prop.obj"
+                    scale="0.01 0.01 0.01" />
+            </geometry>
+        </visual>
+    </link>
+    <joint name="rotor_1_joint" type="continuous">
+        <origin rpy="0 0 0" xyz="0.214 -0.207 0.029" />
+        <parent link="base_link" />
+        <child link="rotor_0" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+    <!-- Rotor 1: Back Left (CCW) -->
+    <link name="rotor_3">
+        <inertial>
+            <mass value="0.05" />
+            <origin xyz="0 0 0" rpy="0 0 1.57" />
+            <inertia ixx="5.20833e-07" ixy="0.0" ixz="0.0" iyy="2.68854e-04" iyz="0.0"
+                izz="2.69271e-04" />
+        </inertial>
+        <visual>
+            <origin rpy="1.57 0 0" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://medvtol_description/meshes/medvtol_prop.obj"
+                    scale="0.01 0.01 0.01" />
+            </geometry>
+        </visual>
+    </link>
+    <joint name="rotor_3_joint" type="continuous">
+        <origin rpy="0 0 0" xyz="-0.201 0.207 0.029" />
+        <parent link="base_link" />
+        <child link="rotor_1" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+    <!-- Rotor 2: Front Left (CW) -->
+    <link name="rotor_0">
+        <inertial>
+            <mass value="0.05" />
+            <origin xyz="0 0 0" rpy="0 0 1.57" />
+            <inertia ixx="5.20833e-07" ixy="0.0" ixz="0.0" iyy="2.68854e-04" iyz="0.0"
+                izz="2.69271e-04" />
+        </inertial>
+        <visual>
+            <origin rpy="1.57 0 0" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://medvtol_description/meshes/medvtol_prop.obj"
+                    scale="0.01 0.01 0.01" />
+            </geometry>
+        </visual>
+    </link>
+    <joint name="rotor_0_joint" type="continuous">
+        <origin rpy="0 0 0" xyz="0.214 0.207 0.029" />
+        <parent link="base_link" />
+        <child link="rotor_2" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+    <!-- Rotor 3: Back Right (CW) -->
+    <link name="rotor_1">
+        <inertial>
+            <mass value="0.05" />
+            <origin xyz="0 0 0" rpy="0 0 1.57" />
+            <inertia ixx="5.20833e-07" ixy="0.0" ixz="0.0" iyy="2.68854e-04" iyz="0.0"
+                izz="2.69271e-04" />
+        </inertial>
+        <visual>
+            <origin rpy="1.57 0 0" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://medvtol_description/meshes/medvtol_prop.obj"
+                    scale="0.01 0.01 0.01" />
+            </geometry>
+        </visual>
+    </link>
+    <joint name="rotor_1_joint" type="continuous">
+        <origin rpy="0 0 0" xyz="-0.201 -0.207 0.029" />
+        <parent link="base_link" />
+        <child link="rotor_3" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+    <!-- GAZEBO SENSORS (Attached to base_link and formatted for PX4 bridge) -->
+    <gazebo reference="base_link">
+
+        <sensor name="air_pressure_sensor" type="air_pressure">
+            <gz_frame_id>base_link</gz_frame_id>
+            <always_on>1</always_on>
+            <update_rate>50</update_rate>
+            <air_pressure>
+                <pressure>
+                    <noise type="gaussian">
+                        <mean>0</mean>
+                        <stddev>3</stddev>
+                    </noise>
+                </pressure>
+            </air_pressure>
+        </sensor>
+
+        <sensor name="magnetometer_sensor" type="magnetometer">
+            <gz_frame_id>base_link</gz_frame_id>
+            <always_on>1</always_on>
+            <update_rate>100</update_rate>
+            <magnetometer>
+                <x>
+                    <noise type="gaussian">
+                        <stddev>0.0001</stddev>
+                    </noise>
+                </x>
+                <y>
+                    <noise type="gaussian">
+                        <stddev>0.0001</stddev>
+                    </noise>
+                </y>
+                <z>
+                    <noise type="gaussian">
+                        <stddev>0.0001</stddev>
+                    </noise>
+                </z>
+            </magnetometer>
+        </sensor>
+
+        <sensor name="imu_sensor" type="imu">
+            <gz_frame_id>base_link</gz_frame_id>
+            <always_on>1</always_on>
+            <update_rate>250</update_rate>
+            <imu>
+                <angular_velocity>
+                    <x>
+                        <noise type="gaussian">
+                            <mean>0.0</mean>
+                            <stddev>0.0008726646</stddev>
+                        </noise>
+                    </x>
+                    <y>
+                        <noise type="gaussian">
+                            <mean>0.0</mean>
+                            <stddev>0.0008726646</stddev>
+                        </noise>
+                    </y>
+                    <z>
+                        <noise type="gaussian">
+                            <mean>0.0</mean>
+                            <stddev>0.0008726646</stddev>
+                        </noise>
+                    </z>
+                </angular_velocity>
+                <linear_acceleration>
+                    <x>
+                        <noise type="gaussian">
+                            <mean>0.0</mean>
+                            <stddev>0.00637</stddev>
+                        </noise>
+                    </x>
+                    <y>
+                        <noise type="gaussian">
+                            <mean>0.0</mean>
+                            <stddev>0.00637</stddev>
+                        </noise>
+                    </y>
+                    <z>
+                        <noise type="gaussian">
+                            <mean>0.0</mean>
+                            <stddev>0.00686</stddev>
+                        </noise>
+                    </z>
+                </linear_acceleration>
+            </imu>
+        </sensor>
+
+        <sensor name="navsat_sensor" type="navsat">
+            <gz_frame_id>base_link</gz_frame_id>
+            <always_on>1</always_on>
+            <update_rate>30</update_rate>
+        </sensor>
+    </gazebo>
+
+    <!-- MOTOR PLUGIN MACRO -->
+    <xacro:macro name="motor_plugin" params="motor_number joint_name link_name turning_direction">
+        <gazebo>
+            <plugin filename="gz-sim-multicopter-motor-model-system"
+                name="gz::sim::systems::MulticopterMotorModel">
+                <jointName>${joint_name}</jointName>
+                <linkName>${link_name}</linkName>
+                <turningDirection>${turning_direction}</turningDirection>
+                <timeConstantUp>0.0125</timeConstantUp>
+                <timeConstantDown>0.025</timeConstantDown>
+                <maxRotVelocity>1671.0</maxRotVelocity>
+                <motorConstant>2.107e-05</motorConstant>
+                <momentConstant>0.016</momentConstant>
+                <commandSubTopic>command/motor_speed</commandSubTopic>
+                <motorNumber>${motor_number}</motorNumber>
+                <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+                <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+                <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+                <motorType>velocity</motorType>
+            </plugin>
+        </gazebo>
+    </xacro:macro>
+
+    <!-- ASSIGN PLUGINS TO ROTORS -->
+    <xacro:motor_plugin motor_number="0" joint_name="rotor_0_joint" link_name="rotor_0"
+        turning_direction="ccw" />
+    <xacro:motor_plugin motor_number="1" joint_name="rotor_1_joint" link_name="rotor_1"
+        turning_direction="ccw" />
+    <xacro:motor_plugin motor_number="2" joint_name="rotor_2_joint" link_name="rotor_2"
+        turning_direction="cw" />
+    <xacro:motor_plugin motor_number="3" joint_name="rotor_3_joint" link_name="rotor_3"
+        turning_direction="cw" />
+
+    <!-- MOTOR FAILURE PLUGIN -->
+    <gazebo>
+        <plugin filename="MotorFailurePlugin" name="gz::sim::systems::MotorFailureSystem"></plugin>
+    </gazebo>
+
+</robot>
