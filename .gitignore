@@ -7,3 +7,5 @@ qgc.AppImage
 src/falcon_inner_loop
 src/falcon_interfaces
 src/falcon_state_estimation
+src/airlink
+src/airlink_interfaces
