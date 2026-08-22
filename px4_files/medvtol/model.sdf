@@ -26,7 +26,7 @@
         <geometry>
           <mesh>
             <scale>0.01 0.01 0.01</scale>
-            <uri>model://morpho_description/meshes/medvtol.obj</uri>
+            <uri>model://medvtol_description/meshes/medvtol.obj</uri>
           </mesh>
         </geometry>
       </visual>
@@ -36,7 +36,7 @@
         <geometry>
           <mesh>
             <scale>0.01 0.01 0.01</scale>
-            <uri>model://morpho_description/meshes/medvtol.obj</uri>
+            <uri>model://medvtol_description/meshes/medvtol.obj</uri>
           </mesh>
         </geometry>
         <surface>
@@ -119,7 +119,7 @@
       </inertial>
       <visual name="rotor_0_visual">
         <pose>0 0 0 1.5700000000000001 0 0</pose>
-        <geometry><mesh><scale>0.01 0.01 0.01</scale><uri>model://morpho_description/meshes/medvtol_prop.obj</uri></mesh></geometry>
+        <geometry><mesh><scale>0.01 0.01 0.01</scale><uri>model://medvtol_description/meshes/medvtol_prop.obj</uri></mesh></geometry>
       </visual>
     </link>
     <joint name="rotor_0_joint" type="revolute">
@@ -148,7 +148,7 @@
       </inertial>
       <visual name="rotor_1_visual">
         <pose>0 0 0 1.5700000000000001 0 0</pose>
-        <geometry><mesh><scale>0.01 0.01 0.01</scale><uri>model://morpho_description/meshes/medvtol_prop.obj</uri></mesh></geometry>
+        <geometry><mesh><scale>0.01 0.01 0.01</scale><uri>model://medvtol_description/meshes/medvtol_prop.obj</uri></mesh></geometry>
       </visual>
     </link>
     <joint name="rotor_1_joint" type="revolute">
@@ -177,7 +177,7 @@
       </inertial>
       <visual name="rotor_2_visual">
         <pose>0 0 0 1.5700000000000001 0 0</pose>
-        <geometry><mesh><scale>0.01 0.01 0.01</scale><uri>model://morpho_description/meshes/medvtol_prop.obj</uri></mesh></geometry>
+        <geometry><mesh><scale>0.01 0.01 0.01</scale><uri>model://medvtol_description/meshes/medvtol_prop.obj</uri></mesh></geometry>
       </visual>
     </link>
     <joint name="rotor_2_joint" type="revolute">
@@ -206,7 +206,7 @@
       </inertial>
       <visual name="rotor_3_visual">
         <pose>0 0 0 1.5700000000000001 0 0</pose>
-        <geometry><mesh><scale>0.01 0.01 0.01</scale><uri>model://morpho_description/meshes/medvtol_prop.obj</uri></mesh></geometry>
+        <geometry><mesh><scale>0.01 0.01 0.01</scale><uri>model://medvtol_description/meshes/medvtol_prop.obj</uri></mesh></geometry>
       </visual>
     </link>
     <joint name="rotor_3_joint" type="revolute">

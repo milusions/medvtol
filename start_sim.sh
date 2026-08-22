@@ -1,3 +1,4 @@
+colcon build
 ./update_px4_model.sh
 cd ~/PX4-Autopilot
 rm -rf build/
