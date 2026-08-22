@@ -1,0 +1,10 @@
+# Installing Micro-XRCE DDS
+
+# sudo snap install micro-xrce-dds-agent --edge 
+
+# Running Micro-XRCE DDS for SITL
+
+# micro-xrce-dds-agent udp4 -p 8888
+
+# Running Micro-XRCE DDS for Serial Communication
+# micro-xrce-dds-agent serial --dev /dev/ttyAMA0 -b 921600

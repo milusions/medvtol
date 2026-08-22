@@ -1,0 +1,11 @@
+float64 x
+float64 y
+float64 z
+float64 lat
+float64 lon
+float64 altitude
+float64 vx
+float64 vy
+float64 vz
+string flight_stage
+string flight_mode

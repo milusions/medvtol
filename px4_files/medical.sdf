@@ -92,23 +92,36 @@
     </spherical_coordinates>
 
     <include>
-      <uri>model://medical_storage</uri>
-      <pose>0 3 0 0 0 3.14</pose>
+      <uri>model://hospital</uri>
+      <name>hospital_a</name>
+      <pose>0 10 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://helipad</uri>
+      <name>helipad_a</name>
+      <pose>0 5 0.02 0 0 3.14</pose>
     </include>
 
     <include>
       <uri>model://hospital</uri>
+      <name>hospital_b</name>
       <pose>50 20 0 0 0 0</pose>
     </include>
     <include>
       <uri>model://helipad</uri>
-      <name>helipad_2</name>
+      <name>helipad_b</name>
       <pose>50 15 0.02 0 0 3.14</pose>
     </include>
-
+    <include>
+      <uri>model://hospital</uri>
+      <name>hospital_c</name>
+      <pose>40 -20 0 0 0 0</pose>
+    </include>
     <include>
       <uri>model://helipad</uri>
-      <pose>0 3 1.72 0 0 3.14</pose>
+      <name>helipad_c</name>
+      <pose>40 -25 0.02 0 0 3.14</pose>
     </include>
+
   </world>
 </sdf>

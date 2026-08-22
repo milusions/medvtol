@@ -1,0 +1,10 @@
+# Request
+float64 target_lat
+float64 target_lon
+float64 target_alt
+float64 cruise_alt
+bool abort
+---
+# Response
+bool success
+string message
